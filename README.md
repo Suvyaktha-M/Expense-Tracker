@@ -1,2 +1,2 @@
 # Expense-Tracker
-this is readme for expense tracker
+A web application to record, manage, and track personal income and expenses.
