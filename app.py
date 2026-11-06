@@ -264,7 +264,6 @@ def transactions():
 # ---------------- ADD TRANSACTION ----------------
 
 @app.route("/add", methods=["POST"])
-@app.route("/add", methods=["POST"])
 def add_transaction():
     data, error = validate_transaction(request.form)
 
