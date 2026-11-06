@@ -1,0 +1,89 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FinTrack | Edit Transaction</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="layout">
+
+    <aside class="sidebar">
+        <h2>FinTrack<span>.</span></h2>
+        <p class="side-label">MENU</p>
+        <a href="{{ url_for('home') }}">▦ Dashboard</a>
+        <a href="{{ url_for('transactions') }}" class="active">▤ Transactions</a>
+    </aside>
+
+    <main class="main-content">
+
+        <header class="topbar">
+            <div>
+                <h1>Edit Transaction</h1>
+                <p>Update your financial record.</p>
+            </div>
+            <a href="{{ url_for('transactions') }}" class="view-all">← Back to Transactions</a>
+        </header>
+
+        <section class="panel edit-panel">
+
+            <form method="POST" class="transaction-form">
+
+                <label>Transaction Title</label>
+                <input type="text" name="title"
+                       value="{{ record.title }}" maxlength="100" required>
+
+                <label>Amount (₹)</label>
+                <input type="number" name="amount"
+                       value="{{ record.amount }}"
+                       min="0.01" step="0.01" required>
+
+                <label>Transaction Type</label>
+                <select name="transaction_type" required>
+                    <option value="Income"
+                        {% if record.transaction_type == 'Income' %}selected{% endif %}>
+                        Income
+                    </option>
+                    <option value="Expense"
+                        {% if record.transaction_type == 'Expense' %}selected{% endif %}>
+                        Expense
+                    </option>
+                </select>
+
+                <label>Category</label>
+                <select name="category" required>
+                    {% for category in income_categories %}
+                    <option value="{{ category }}"
+                        {% if record.category == category %}selected{% endif %}>
+                        {{ category }}
+                    </option>
+                    {% endfor %}
+
+                    {% for category in expense_categories %}
+                    <option value="{{ category }}"
+                        {% if record.category == category %}selected{% endif %}>
+                        {{ category }}
+                    </option>
+                    {% endfor %}
+                </select>
+
+                <label>Date</label>
+                <input type="date" name="transaction_date"
+                       value="{{ record.transaction_date }}" required>
+
+                <button type="submit" class="primary-btn">Save Changes</button>
+
+                <a href="{{ url_for('transactions') }}" class="reset-btn">
+                    Cancel
+                </a>
+
+            </form>
+
+        </section>
+    </main>
+</div>
+</body>
+</html>

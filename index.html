@@ -1,0 +1,202 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FinTrack | Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="layout">
+
+    <aside class="sidebar">
+        <h2>FinTrack<span>.</span></h2>
+        <p class="side-label">MENU</p>
+        <a href="{{ url_for('home') }}" class="active">▦ Dashboard</a>
+        <a href="{{ url_for('transactions') }}">▤ Transactions</a>
+
+        <div class="sidebar-bottom">
+            <strong>Personal Finance Manager</strong>
+            <small>Stay on top of your spending.</small>
+        </div>
+    </aside>
+
+    <main class="main-content">
+
+        <header class="topbar">
+            <div>
+                <h1>Dashboard</h1>
+                <p>Welcome back! Here's your financial overview.</p>
+            </div>
+            <span class="date-label">{{ count }} RECORDS</span>
+        </header>
+
+        <section class="summary">
+
+            <div class="summary-card income-card">
+                <p>Total Income</p>
+                <h2>₹{{ "%.2f"|format(income) }}</h2>
+                <small>All recorded income</small>
+            </div>
+
+            <div class="summary-card expense-card">
+                <p>Total Expenses</p>
+                <h2>₹{{ "%.2f"|format(expenses) }}</h2>
+                <small>All recorded expenses</small>
+            </div>
+
+            <div class="summary-card savings-card">
+                <p>Current Net Savings</p>
+                <h2>₹{{ "%.2f"|format(savings) }}</h2>
+                <small>Income minus expenses</small>
+            </div>
+
+            <div class="summary-card">
+                <p>Transactions</p>
+                <h2>{{ count }}</h2>
+                <small>Total records</small>
+            </div>
+
+        </section>
+
+        <section class="summary secondary-summary">
+            <div class="summary-card">
+                <p>This Month's Expenses</p>
+                <h2>₹{{ "%.2f"|format(monthly_expenses) }}</h2>
+                <small>Current month</small>
+            </div>
+
+            <div class="summary-card">
+                <p>Today's Expenses</p>
+                <h2>₹{{ "%.2f"|format(today_expenses) }}</h2>
+                <small>Recorded today</small>
+            </div>
+        </section>
+
+        <section class="content-grid">
+
+            <div class="panel">
+                <div class="panel-heading">
+                    <h2>Add Transaction</h2>
+                    <span class="icon">＋</span>
+                </div>
+
+                <form action="{{ url_for('add_transaction') }}"
+                      method="POST" class="transaction-form">
+
+                    <label>Transaction Title</label>
+                    <input type="text" name="title"
+                           placeholder="e.g. Monthly salary" maxlength="100" required>
+
+                    <label>Amount (₹)</label>
+                    <input type="number" name="amount"
+                           placeholder="Enter amount"
+                           min="0.01" step="0.01" required>
+
+                    <label>Transaction Type</label>
+                    <select name="transaction_type" required>
+                        <option value="">Select type</option>
+                        <option value="Income">Income</option>
+                        <option value="Expense">Expense</option>
+                    </select>
+
+                    <label>Category</label>
+                    <select name="category" required>
+                        <option value="">Select category</option>
+                        <optgroup label="Income">
+                            <option>Salary</option>
+                            <option>Freelance</option>
+                            <option>Allowance</option>
+                            <option>Investment</option>
+                            <option>Other</option>
+                        </optgroup>
+                        <optgroup label="Expense">
+                            <option>Food</option>
+                            <option>Travel</option>
+                            <option>Shopping</option>
+                            <option>Bills</option>
+                            <option>Education</option>
+                            <option>Entertainment</option>
+                            <option>Health</option>
+                            <option>Other</option>
+                        </optgroup>
+                    </select>
+
+                    <label>Date</label>
+                    <input type="date" name="transaction_date" required>
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for category, message in messages %}
+        <div class="alert {{ category }}">{{ message }}</div>
+    {% endfor %}
+{% endwith %}
+
+                    <button type="submit" class="primary-btn">
+                        Add Transaction
+                    </button>
+
+                </form>
+            </div>
+            <div class="panel">
+                <div class="panel-heading">
+                    <h2>Expense Categories</h2>
+                </div>
+                {% for item in category_totals %}
+                <div class="category-row">
+                    <span>{{ item.category }}</span>
+                    <strong>₹{{ "%.2f"|format(item.total) }}</strong>
+                </div>
+                {% else %}
+                <p class="empty-message">No expenses recorded yet.</p>
+                {% endfor %}
+            </div>
+        </section>
+        <section class="panel transactions">
+            <div class="transaction-heading">
+                <div>
+                    <h2>Recent Transactions</h2>
+                    <p>Your latest financial records</p>
+                </div>
+                <a href="{{ url_for('transactions') }}" class="view-all">
+                    View All →
+                </a>
+            </div>
+            {% if recent %}
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Type</th>
+                            <th>Category</th>
+                            <th>Date</th>
+                            <th>Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for record in recent %}
+                        <tr>
+                            <td><strong>{{ record.title }}</strong></td>
+                            <td>
+                                <span class="type-badge {{ record.transaction_type|lower }}">
+                                    {{ record.transaction_type }}
+                                </span>
+                            </td>
+                            <td><span class="category-badge">{{ record.category }}</span></td>
+                            <td>{{ record.transaction_date }}</td>
+                            <td class="amount">₹{{ "%.2f"|format(record.amount) }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="empty-message">No transactions yet. Add your first record!</p>
+            {% endif %}
+        </section>
+        <footer>FinTrack · Manage your money wisely.</footer>
+    </main>
+</div>
+</body>
+</html>

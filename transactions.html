@@ -1,0 +1,140 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FinTrack | Transactions</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="layout">
+
+    <aside class="sidebar">
+        <h2>FinTrack<span>.</span></h2>
+        <p class="side-label">MENU</p>
+        <a href="{{ url_for('home') }}">▦ Dashboard</a>
+        <a href="{{ url_for('transactions') }}" class="active">▤ Transactions</a>
+
+        <div class="sidebar-bottom">
+            <strong>Personal Finance Manager</strong>
+            <small>Stay on top of your spending.</small>
+        </div>
+    </aside>
+
+    <main class="main-content">
+
+        <header class="topbar">
+            <div>
+                <h1>Transactions</h1>
+                <p>View and manage all your financial records.</p>
+            </div>
+            <a href="{{ url_for('home') }}" class="view-all">
+                + Add Transaction
+            </a>
+        </header>
+
+        <section class="panel transactions">
+
+            <div class="transaction-heading">
+                <div>
+                    <h2>Transaction History</h2>
+                    <p>{{ records|length }} matching records</p>
+                </div>
+            </div>
+
+            <form action="{{ url_for('transactions') }}" method="GET"
+                  class="filter-form">
+
+                <input type="search" name="q"
+                       placeholder="Search transaction title..."
+                       value="{{ search }}">
+
+                <select name="type">
+                    <option value="">All Types</option>
+                    {% for item in types %}
+                    <option value="{{ item }}"
+                        {% if selected_type == item %}selected{% endif %}>
+                        {{ item }}
+                    </option>
+                    {% endfor %}
+                </select>
+
+                <select name="category">
+                    <option value="">All Categories</option>
+                    {% for item in categories %}
+                    <option value="{{ item }}"
+                        {% if selected_category == item %}selected{% endif %}>
+                        {{ item }}
+                    </option>
+                    {% endfor %}
+                </select>
+
+                <button type="submit" class="primary-btn">Apply Filters</button>
+                <a href="{{ url_for('transactions') }}" class="reset-btn">Reset</a>
+
+            </form>
+
+            {% if records %}
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Type</th>
+                            <th>Category</th>
+                            <th>Date</th>
+                            <th>Amount</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for record in records %}
+                        <tr>
+                            <td><strong>{{ record.title }}</strong></td>
+
+                            <td>
+                                <span class="type-badge {{ record.transaction_type|lower }}">
+                                    {{ record.transaction_type }}
+                                </span>
+                            </td>
+
+                            <td>
+                                <span class="category-badge">{{ record.category }}</span>
+                            </td>
+
+                            <td>{{ record.transaction_date }}</td>
+
+                            <td class="amount">
+                                ₹{{ "%.2f"|format(record.amount) }}
+                            </td>
+
+                            <td>
+                                <div class="actions">
+                                    <a href="{{ url_for('edit_transaction', transaction_id=record.id) }}"
+                                       class="edit-btn">Edit</a>
+                                    <form action="{{ url_for('delete_transaction', transaction_id=record.id) }}"
+                                          method="POST"
+                                          onsubmit="return confirm('Delete this transaction?');">
+                                        <button type="submit" class="delete-btn">
+                                            Delete
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="empty-message">No matching transactions found.</p>
+            {% endif %}
+        </section>
+        <footer>FinTrack · Manage your money wisely.</footer>
+    </main>
+</div>
+</body>
+</html>
