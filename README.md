@@ -172,4 +172,4 @@ The application validates transaction details on both the client and server side
 
 ## 📌 Project Objective
 
-This project was developed as part of the **CodeNova Full Stack Development Internship – Task 2: Expense Tracker**, focusing on full-stack development, REST API integration, data validation, database persistence, and responsive user interface design.
+This project focuses on full-stack development, REST API integration, data validation, database persistence, and responsive user interface design.
